@@ -1,6 +1,6 @@
 from PyPDF2 import PdfReader
 from joblib import Memory
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 mem = Memory("cache")
 
@@ -20,14 +20,18 @@ def pdf_to_text(filename):
 def split_text(document):
     # specifically for OpenAI Ada Embeddings
 
-    text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
-        encoding_name=MODEL_NAME, chunk_size=512, chunk_overlap=0
+    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+        model_name=MODEL_NAME, chunk_size=256, chunk_overlap=0
     )
 
     return text_splitter.split_text(document)
+
+@mem.cache
+def embed_chunk(chunk):
+    pass
 
 
 text = pdf_to_text("xinu.pdf")
 chunks = split_text(text)
 
-print(chunks)
+print(len(chunks))
