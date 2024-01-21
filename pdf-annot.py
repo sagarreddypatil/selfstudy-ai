@@ -102,7 +102,7 @@ def heatmap(textbook_location: str, exam_location: str, threshold: float = 0.75)
     
     doc.set_toc(toc_seq)
 
-    annot_fname = add_filename_suffix(textbook_loc, "-annot")
+    annot_fname = add_filename_suffix(textbook_location, "-annot")
     doc.save(annot_fname)
 
     return annot_fname, annot_pgnums
