@@ -40,12 +40,12 @@ def segment_chunks(loc, length, chunks):
 def heatmap(textbook_location: str, exam_location: str, threshold: float = 0.75) -> str:
     doc = fitz.open(textbook_location)
 
-    textbook, chunks = pdf_to_text("xinu.pdf")
+    textbook, chunks = pdf_to_text(textbook_location)
 
     textbook_chunks = split_material_text(textbook)
     textbook_embeddings = embed_chunks(textbook_chunks)
 
-    exam_questions, *_ = pdf_to_text("xinu-midterm-spring23.pdf")
+    exam_questions, *_ = pdf_to_text(exam_location)
     exam_question_embeddings = embed_chunks(split_exam_text(exam_questions))
 
     textbook_chunk_similarities = []
