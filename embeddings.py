@@ -99,7 +99,11 @@ def heatmap(textbook_location: str, exam_location: str):
 
     # normalize
     textbook_chunk_similarities = normalize(np.array(textbook_chunk_similarities))
-    print("\n".join([str(float(x)) for x in textbook_chunk_similarities]))
+    for i, value in enumerate(textbook_chunk_similarities):
+        # print(f"{i},{value}")
+        if value > 0.75:
+            print("--------------------------")
+            print(textbook_chunks[i])
 
 if __name__ == "__main__":
     heatmap("xinu.pdf", "xinu-midterm-spring23.pdf")
