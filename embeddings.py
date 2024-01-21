@@ -69,7 +69,6 @@ def embed_chunks(chunks: list[str]):
 
     return embeddings
 
-@mem.cache
 def similarity(a: np.ndarray, b: np.ndarray) -> float:
     score = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
@@ -96,5 +95,4 @@ if __name__ == "__main__":
     # normalize
     textbook_chunk_similarities = np.array(textbook_chunk_similarities)
     textbook_chunk_similarities = (textbook_chunk_similarities - np.min(textbook_chunk_similarities)) / (np.max(textbook_chunk_similarities) - np.min(textbook_chunk_similarities))
-
 
