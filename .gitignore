@@ -198,5 +198,6 @@ pyrightconfig.json
 # test files
 *.pdf
 *.txt
+!requirements.txt
 
 cache/
