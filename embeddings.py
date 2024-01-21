@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from pypdf import PdfReader
+import fitz
 from joblib import Memory
 from openai import OpenAI
 import numpy as np
@@ -23,10 +23,10 @@ openai = OpenAI(api_key=OPENAI_API_KEY)
 
 @mem.cache
 def pdf_to_text(filename: str) -> str:
-    reader = PdfReader(filename)
+    doc = fitz.open(filename)
     text = ""
-    for page in reader.pages:
-        text += page.extract_text()
+    for page in doc:
+        text += page.get_text()
 
     return text
 
@@ -105,4 +105,5 @@ def heatmap(textbook_location: str, exam_location: str):
             print(textbook_chunks[i])
 
 if __name__ == "__main__":
-    heatmap("xinu.pdf", "xinu-midterm-spring23.pdf")
+    print(pdf_to_text("xinu.pdf"))
+    # heatmap("xinu.pdf", "xinu-midterm-spring23.pdf")
