@@ -69,7 +69,6 @@ def embed_chunks(chunks: list[str]):
 
     return embeddings
 
-@mem.cache
 def similarity(a: np.ndarray, b: np.ndarray) -> float:
     score = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
