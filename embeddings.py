@@ -10,6 +10,7 @@ import numpy as np
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 import string
+
 PRINTABLE = set(string.printable)
 
 mem = Memory("~/.cache")
@@ -40,11 +41,18 @@ def split_material_text(document: str) -> list[str]:
 
     return text_splitter.split_text(document)
 
+
 @mem.cache
 def split_exam_text(document: str) -> list[str]:
     # tailored for exam questions
 
-    text_splitter = RecursiveCharacterTextSplitter(separators=["\n"])
+    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+        model_name=MODEL_NAME,
+        separators=[" ", ",", "\n"],
+        chunk_size=256,
+        chunk_overlap=128,
+    )
+
     return text_splitter.split_text(document)
 
 
@@ -61,13 +69,32 @@ def embed_chunks(chunks: list[str]):
 
     return embeddings
 
+@mem.cache
+def similarity(a: np.ndarray, b: np.ndarray) -> float:
+    score = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+    # normalize to 0-1
+    return (score + 1) / 2
+
 
 if __name__ == "__main__":
     textbook = pdf_to_text("xinu.pdf")
     textbook_embeddings = embed_chunks(split_material_text(textbook))
 
-    # exam_questions = pdf_to_text("xinu-midterm-spring23.pdf")
-    # exam_chunks = split_exam_text(exam_questions)
-    # # exam_question_embeddings = embed_chunks(split_material_text(exam_questions))
+    exam_questions = pdf_to_text("xinu-midterm-spring23.pdf")
+    exam_question_embeddings = embed_chunks(split_exam_text(exam_questions))
 
-    # print("\n-----------------\n".join(exam_chunks))
+    textbook_chunk_similarities = []
+
+    for i, textbook_embedding in enumerate(textbook_embeddings):
+        similarities = []
+        for exam_question_embedding in exam_question_embeddings:
+            similarities.append(similarity(textbook_embedding, exam_question_embedding))
+
+        textbook_chunk_similarities.append(sum(similarities))
+
+    # normalize
+    textbook_chunk_similarities = np.array(textbook_chunk_similarities)
+    textbook_chunk_similarities = (textbook_chunk_similarities - np.min(textbook_chunk_similarities)) / (np.max(textbook_chunk_similarities) - np.min(textbook_chunk_similarities))
+
+
