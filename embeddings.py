@@ -76,12 +76,16 @@ def similarity(a: np.ndarray, b: np.ndarray) -> float:
     # normalize to 0-1
     return (score + 1) / 2
 
+def normalize(x: np.ndarray) -> np.ndarray:
+    return (x - np.min(x)) / (np.max(x) - np.min(x))
 
-if __name__ == "__main__":
-    textbook = pdf_to_text("xinu.pdf")
-    textbook_embeddings = embed_chunks(split_material_text(textbook))
 
-    exam_questions = pdf_to_text("xinu-midterm-spring23.pdf")
+def heatmap(textbook_location: str, exam_location: str):
+    textbook = pdf_to_text(textbook_location)
+    textbook_chunks = split_material_text(textbook)
+    textbook_embeddings = embed_chunks(textbook_chunks)
+
+    exam_questions = pdf_to_text(exam_location)
     exam_question_embeddings = embed_chunks(split_exam_text(exam_questions))
 
     textbook_chunk_similarities = []
@@ -94,7 +98,8 @@ if __name__ == "__main__":
         textbook_chunk_similarities.append(sum(similarities))
 
     # normalize
-    textbook_chunk_similarities = np.array(textbook_chunk_similarities)
-    textbook_chunk_similarities = (textbook_chunk_similarities - np.min(textbook_chunk_similarities)) / (np.max(textbook_chunk_similarities) - np.min(textbook_chunk_similarities))
+    textbook_chunk_similarities = normalize(np.array(textbook_chunk_similarities))
+    print("\n".join([str(float(x)) for x in textbook_chunk_similarities]))
 
-
+if __name__ == "__main__":
+    heatmap("xinu.pdf", "xinu-midterm-spring23.pdf")
