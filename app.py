@@ -34,11 +34,11 @@ def upload():
     exam_sources_pdf.save('exam_sources.pdf')
 
 
-    textbook = embeddings.pdf_to_text("study_sources.pdf")
+    textbook = embeddings.pdf_to_text("study_sources.pdf")[0]
     textbook_chunks = embeddings.split_material_text(textbook)
     textbook_embeddings = embeddings.embed_chunks(textbook_chunks)
 
-    exam_questions = embeddings.pdf_to_text("exam_sources.pdf")
+    exam_questions = embeddings.pdf_to_text("exam_sources.pdf")[0]
     exam_chunks = embeddings.split_exam_text(exam_questions)
     exam_question_embeddings = embeddings.embed_chunks(exam_chunks)
 

@@ -96,4 +96,5 @@ def heatmap(textbook_location: str, exam_location: str):
 
 if __name__ == "__main__":
     # print(pdf_to_text("xinu.pdf"))
-    heatmap("xinu.pdf", "xinu-midterm-spring23.pdf")
+    # heatmap("xinu.pdf", "xinu-midterm-spring23.pdf")
+    print(pdf_to_text("xinu.pdf")[0])
