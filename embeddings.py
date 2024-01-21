@@ -28,29 +28,30 @@ class Chunk:
     page: int
     rect: fitz.Rect
 
+    loc: int
+    length: int
+
 
 @mem.cache
 def pdf_to_text(filename: str) -> str:
     doc = fitz.open(filename)
     text = ""
 
-    page_starts = []
     chunks = []
     chunk_offsets = []
 
     for pagenum, page in enumerate(doc):
-        page_starts.append(len(text))
-
         for block in page.get_text("blocks"):
-            if block[4] == "":
+            content = block[4]
+            if content == "":
                 continue
 
-            chunks.append(Chunk(page=pagenum, rect=fitz.Rect(block[:4])))
+            chunks.append(Chunk(page=pagenum, rect=fitz.Rect(block[:4]), loc=len(text), length=len(content)))
             chunk_offsets.append(len(text))
 
-            text += block[4]
+            text += content
 
-    return text, page_starts, chunks, chunk_offsets
+    return text, chunks
 
 
 @mem.cache
@@ -110,7 +111,7 @@ def normalize(x: np.ndarray) -> np.ndarray:
 
 
 if __name__ == "__main__":
-    textbook, page_starts, *_ = pdf_to_text("xinu.pdf")
+    textbook, *_ = pdf_to_text("xinu.pdf")
 
     textbook_chunks = split_material_text(textbook)
     textbook_embeddings = embed_chunks(textbook_chunks)
