@@ -52,7 +52,7 @@ class Chunk:
 
 
 # @rcache.cache()
-@mem.cache
+# @mem.cache
 def pdf_to_text(filename: str) -> tuple[str, list[Chunk]]:
     doc = fitz.open(filename)
     text = ""

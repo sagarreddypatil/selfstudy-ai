@@ -36,7 +36,7 @@ def segment_chunks(loc, length, chunks):
     return out
 
 
-@mem.cache
+# @mem.cache
 def heatmap(textbook_location: str, exam_location: str, threshold: float = 0.75) -> str:
     doc = fitz.open(textbook_location)
 
@@ -64,6 +64,8 @@ def heatmap(textbook_location: str, exam_location: str, threshold: float = 0.75)
     toc_seg = set()
     toc_summary = []
 
+    csp_list = []
+
     highlighted = set()
     for i, value in enumerate(textbook_chunk_similarities):
         if value < threshold:
@@ -76,10 +78,16 @@ def heatmap(textbook_location: str, exam_location: str, threshold: float = 0.75)
         chunk_indices = segment_chunks(loc, length, chunks)
         segment_text = textbook_chunks[i]
 
+        counter = 0
+
         # highlight the chunks
         for ci in chunk_indices:
             chunk = chunks[ci]
             page = doc[chunk.page]
+
+            if counter == 0:
+                csp_list.append((segment_text, value, chunk.page))
+                counter += 1
 
             if page.number not in toc_pages and i not in toc_seg:
                 toc_pages.add(page.number)
@@ -102,10 +110,12 @@ def heatmap(textbook_location: str, exam_location: str, threshold: float = 0.75)
     
     doc.set_toc(toc_seq)
 
+    print("saving annotated")
+
     annot_fname = add_filename_suffix(textbook_location, "-annot")
     doc.save(annot_fname)
 
-    return annot_fname, annot_pgnums
+    return annot_fname, annot_pgnums, csp_list
 
 
 if __name__ == "__main__":

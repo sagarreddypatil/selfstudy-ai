@@ -41,7 +41,6 @@ def retrieve_pdf():
 @cross_origin()
 def upload():
     # Check if the POST request has file parts
-    print(list(request.files.items()))
     if 'study_sources' not in request.files or 'exam_sources' not in request.files:
         return jsonify({'error': 'Both study_sources.pdf and exam_sources.pdf are required'}), 400
 
@@ -67,14 +66,15 @@ def upload():
     exam_chunks = embeddings.split_exam_text(exam_questions)
     exam_question_embeddings = embeddings.embed_chunks(exam_chunks)
 
-    annot_filename, page_chunks = pdfannot.heatmap("./study_sources.pdf", "./exam_sources.pdf")
+    annot_filename, page_chunks, csp_list = pdfannot.heatmap("./study_sources.pdf", "./exam_sources.pdf")
 
     res_heatmap = vector.exam_heatmap(textbook_chunks, textbook_embeddings, exam_chunks, exam_question_embeddings)
     # print(res_heatmap)
 
     res_data = {
         "page_numbers": page_chunks,
-        "heatmap": res_heatmap
+        "heatmap": res_heatmap,
+        "csp_list": csp_list
     }
 
     # remove the rest of the exam stuff

@@ -22,7 +22,6 @@ def exam_heatmap(textbook_chunks, textbook_chunk_embeddings, exam_chunks, exam_c
         heatmap.append(
             search_textbook(textbook_chunks, textbook_chunk_embeddings, exam_chunk_embedding, 10)    
         )
-    print(heatmap[-1])
     return heatmap
 
 
