@@ -16,9 +16,13 @@ def search_textbook(textbook_chunks, textbook_embeddings, exam_question_embeddin
    return similarities[:n]
 
 def exam_heatmap(textbook_chunks, textbook_chunk_embeddings, exam_chunks, exam_chunk_embeddings):
-    heatmap = {}
+    # heatmap = {}
+    heatmap = []
     for exam_chunk, exam_chunk_embedding in zip(exam_chunks, exam_chunk_embeddings):
-        heatmap[exam_chunk] = search_textbook(textbook_chunks, textbook_chunk_embeddings, exam_chunk_embedding, 10)
+        heatmap.append(
+            search_textbook(textbook_chunks, textbook_chunk_embeddings, exam_chunk_embedding, 10)    
+        )
+    print(heatmap[-1])
     return heatmap
 
 
