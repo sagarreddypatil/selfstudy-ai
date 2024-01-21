@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import json
+
 import fitz
 from joblib import Memory
 from openai import OpenAI
@@ -22,18 +24,36 @@ OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 
 openai = OpenAI(api_key=OPENAI_API_KEY)
 
+from redis import StrictRedis
+from redis_cache import RedisCache
+import pickle
+
+REDIS_HOST = os.environ["REDIS_HOST"]
+REDIS_PORT = os.environ["REDIS_PORT"]
+REDIS_PWD = os.environ["REDIS_PWD"]
+
+def dumps(x):
+    return pickle.dumps(x)
+
+def loads(x):
+    return pickle.loads(x)
+
+redis = StrictRedis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PWD, decode_responses=False)
+rcache = RedisCache(redis, serializer=dumps, deserializer=loads, key_serializer=json.dumps)
+
 
 @dataclass
 class Chunk:
     page: int
-    rect: fitz.Rect
+    rect: tuple[float, float, float, float]
 
     loc: int
     length: int
 
 
+# @rcache.cache()
 @mem.cache
-def pdf_to_text(filename: str) -> str:
+def pdf_to_text(filename: str) -> tuple[str, list[Chunk]]:
     doc = fitz.open(filename)
     text = ""
 
@@ -46,7 +66,7 @@ def pdf_to_text(filename: str) -> str:
             if content == "":
                 continue
 
-            chunks.append(Chunk(page=pagenum, rect=fitz.Rect(block[:4]), loc=len(text), length=len(content)))
+            chunks.append(Chunk(page=pagenum, rect=block[:4], loc=len(text), length=len(content)))
             chunk_offsets.append(len(text))
 
             text += content
@@ -65,7 +85,8 @@ def split_material_text(document: str) -> list[str]:
     return text_splitter.split_text(document)
 
 
-@mem.cache
+# @mem.cache
+@rcache.cache()
 def split_exam_text(document: str) -> list[str]:
     # tailored for exam questions
 
