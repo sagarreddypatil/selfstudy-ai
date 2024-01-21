@@ -95,15 +95,17 @@ def heatmap(textbook_location: str, exam_location: str, threshold: float = 0.75)
             highlighted.add(ci)
 
     toc_seq = []
+    annot_pgnums = []
     for pagenum, text in toc_summary:
         toc_seq.append([1, text, pagenum])
+        annot_pgnums.append(pagenum)
     
     doc.set_toc(toc_seq)
 
     annot_fname = add_filename_suffix(textbook_loc, "-annot")
     doc.save(annot_fname)
 
-    return annot_fname
+    return annot_fname, annot_pgnums
 
 
 if __name__ == "__main__":
